@@ -34,26 +34,19 @@ namespace Phase4Tweaks
         {
             orig(self, damageInfo);
 
-            if (NetworkServer.active && !damageInfo.rejected && self.body.bodyIndex == brotherHurtIndex && damageInfo.attacker)
+            if (!NetworkServer.active || damageInfo.rejected || !damageInfo.attacker || self.body.bodyIndex != brotherHurtIndex) return;
+
+            GuaranteedItemReturnComponent g = self.GetComponent<GuaranteedItemReturnComponent>();
+            if (!g || !g.ShouldGuaranteedSteal(damageInfo.attacker)) return;
+
+            CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+            if (!attackerBody || !attackerBody.inventory) return;
+
+            ReturnStolenItemsOnGettingHit rsi = self.GetComponent<ReturnStolenItemsOnGettingHit>();
+            if (rsi && rsi.itemStealController && rsi.itemStealController.ReclaimItemForInventory(attackerBody.inventory))
             {
-                GuaranteedItemReturnComponent g = self.GetComponent<GuaranteedItemReturnComponent>();
-                if (g && g.ShouldGuaranteedSteal(damageInfo.attacker))
-                {
-                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                    if (attackerBody && attackerBody.inventory)
-                    {
-                        ReturnStolenItemsOnGettingHit rsi = self.GetComponent<ReturnStolenItemsOnGettingHit>();
-                        if (rsi && rsi.itemStealController)
-                        {
-                            bool returned = rsi.itemStealController.ReclaimItemForInventory(attackerBody.inventory);
-                            if (returned)
-                            {
-                                Debug.Log("Phase4Tweaks: Guaranteed item return for " + attackerBody);
-                                g.SetStealItemCooldown(damageInfo.attacker);
-                            }
-                        }
-                    }
-                }
+                Debug.Log("Phase4Tweaks: Guaranteed item return for " + attackerBody);
+                g.SetStealItemCooldown(damageInfo.attacker);
             }
         }
 

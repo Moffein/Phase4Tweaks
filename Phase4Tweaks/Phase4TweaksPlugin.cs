@@ -34,7 +34,7 @@ namespace Phase4Tweaks
         {
             orig(self, damageInfo);
 
-            if (!damageInfo.rejected && self.body.bodyIndex == brotherHurtIndex && damageInfo.attacker)
+            if (NetworkServer.active && !damageInfo.rejected && self.body.bodyIndex == brotherHurtIndex && damageInfo.attacker)
             {
                 GuaranteedItemReturnComponent g = self.GetComponent<GuaranteedItemReturnComponent>();
                 if (g && g.ShouldGuaranteedSteal(damageInfo.attacker))
@@ -48,7 +48,7 @@ namespace Phase4Tweaks
                             bool returned = rsi.itemStealController.ReclaimItemForInventory(attackerBody.inventory);
                             if (returned)
                             {
-                                Debug.Log("Phase4Tweaks: Guaranteed item return.");
+                                Debug.Log("Phase4Tweaks: Guaranteed item return for " + attackerBody);
                                 g.SetStealItemCooldown(damageInfo.attacker);
                             }
                         }

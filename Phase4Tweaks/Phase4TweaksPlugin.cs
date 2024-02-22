@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using System.Security.Cryptography;
 
 namespace R2API.Utils
 {
